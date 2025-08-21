@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import net.manifest.journalApp.cache.AppCache;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,8 @@ import java.util.List;
 public class AdminController {
           @Autowired
           private UserService userService;
-
+          @Autowired
+          private AppCache appCache;
 
           @GetMapping("/users")
           public ResponseEntity<?>getAllUsers(){
@@ -39,5 +41,12 @@ public class AdminController {
                      System.out.println(e);
                      return new ResponseEntity<>("An error occurred during registration.",HttpStatus.INTERNAL_SERVER_ERROR);
                  }
+          }
+
+          //Re-Initialising my map
+          @GetMapping("/clear-app-cache")
+          public ResponseEntity<?>clearAppCache(){
+               appCache.init();
+               return new ResponseEntity<>("App-Cache cleared successfully.",HttpStatus.OK);
           }
 }
