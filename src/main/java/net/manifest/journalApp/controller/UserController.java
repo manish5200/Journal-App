@@ -44,12 +44,12 @@ public class UserController {
     }
 
 
-     @GetMapping("/greeting")
+     @GetMapping("/external-api")
       public ResponseEntity<?>greetings(){
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
           String  userName = authentication.getName();
 
-         WeatherResponse weatherResponse = weatherService.getWeather("Delhi");
+         WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
          String response ="";
          if(weatherResponse != null){
              response = ", Weather feels like "+weatherResponse.getCurrent().getFeelslike();
