@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public class JournalEntryService {
     public void saveEntry(JournalEntry myEntry, String userName) {
         try {
             User user = userService.findByUserName(userName);
-            myEntry.setDate(LocalDate.now());
+            myEntry.setDate(LocalDateTime.now());
             JournalEntry saved = journalEntryRepository.save(myEntry);
             user.getJournalEntries().add(saved);
             userService.saveUser(user);
