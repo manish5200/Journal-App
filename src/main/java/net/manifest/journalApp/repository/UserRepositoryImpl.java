@@ -33,4 +33,7 @@ public class UserRepositoryImpl {
         return users;
 
     }
+
+    //Scheduler to send message on every Sunday 9.00 AM
+
 }
