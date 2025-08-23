@@ -1,7 +1,9 @@
 package net.manifest.journalApp.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -15,7 +17,9 @@ import java.util.ArrayList;
 
         @Setter
         @Getter
-        public class Current{
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Current{
 
             @JsonProperty("observation_time")
             private String observationTime;
@@ -47,7 +51,9 @@ import java.util.ArrayList;
 
         @Setter
         @Getter
-        public class Location{
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Location{
             private String name;
             private String country;
             private String localtime;

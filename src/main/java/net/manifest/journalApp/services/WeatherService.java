@@ -26,7 +26,6 @@ public class WeatherService {
     private RedisService redisService;
 
     public WeatherResponse getWeather(String city){
-
         WeatherResponse weatherResponse = redisService.get("weather_of_" + city, WeatherResponse.class);
         if(weatherResponse != null){
              return  weatherResponse;
@@ -41,7 +40,7 @@ public class WeatherService {
                     WeatherResponse.class);
             WeatherResponse body = response.getBody();
             if(body != null){
-                 redisService.set("weather_of_"+city,body,300l);
+                 redisService.set("weather_of_"+city,body,600l);
             }
             return body;
         }

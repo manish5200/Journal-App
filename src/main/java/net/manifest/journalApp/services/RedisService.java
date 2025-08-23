@@ -13,29 +13,30 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,Object> redisTemplate;
+
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     public <T> T get(String key, Class<T> entityClass){
            try{
                Object o = redisTemplate.opsForValue().get(key);
-               ObjectMapper mapper = new ObjectMapper();
                if(o == null){
                     return  null;
                }
-               return mapper.readValue(o.toString(),entityClass);
+               return entityClass.cast(o);
            } catch (Exception e) {
-               log.error("Exception in Integrating get method of Redis-Service",e);
+               log.error("Error in getting value from Redis for key {}",key,e);
                return  null;
            }
     }
 
     public void set(String key, Object o ,Long ttl){
         try{
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonValue = mapper.writeValueAsString(o);
-            redisTemplate.opsForValue().set(key,jsonValue,ttl, TimeUnit.SECONDS);
+           // String jsonValue = mapper.writeValueAsString(o);
+            redisTemplate.opsForValue().set(key,o,ttl, TimeUnit.SECONDS);
+            log.info("Saved to Redis with key: {}",key);
         } catch (Exception e) {
-            log.error("Exception in Integrating set method of Redis-Service",e);
+            log.error("Error setting value to Redis for key {}", key, e);
         }
     }
 

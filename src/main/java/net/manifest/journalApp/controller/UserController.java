@@ -32,7 +32,7 @@ public class UserController {
                userInDb.setUserName(user.getUserName());
                userInDb.setPassword(user.getPassword());
                userService.saveNewUser(userInDb);
-          return new ResponseEntity<>("User updated successfully.",HttpStatus.NO_CONTENT);
+          return new ResponseEntity<>("User updated successfully.",HttpStatus.OK);
     }
 
     @DeleteMapping
