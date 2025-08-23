@@ -1,5 +1,6 @@
 package net.manifest.journalApp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,6 +14,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableAsync
@@ -23,10 +25,10 @@ public class JournalApplication {
 
        ConfigurableApplicationContext context = SpringApplication.run(JournalApplication.class, args);
        ConfigurableEnvironment appEnv = context.getEnvironment();
-       System.out.println("Currently active profile: " + appEnv.getActiveProfiles()[0]);
+       log.info("Currently active profile: {}",appEnv.getActiveProfiles()[0]);
     }
     @Bean
-     public PlatformTransactionManager KuchhBhi(MongoDatabaseFactory dbFactory){
+     public PlatformTransactionManager mongoTransactionBean(MongoDatabaseFactory dbFactory){
            return  new MongoTransactionManager(dbFactory);
      }
 

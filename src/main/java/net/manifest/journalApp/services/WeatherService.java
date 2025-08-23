@@ -5,7 +5,6 @@ import net.manifest.journalApp.cache.AppCache;
 import net.manifest.journalApp.constants.Placeholders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

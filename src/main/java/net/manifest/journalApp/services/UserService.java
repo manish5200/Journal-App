@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.repository.UserRepository;
 import org.bson.types.ObjectId;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
