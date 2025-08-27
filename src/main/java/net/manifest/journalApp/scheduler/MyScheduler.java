@@ -8,7 +8,9 @@ import net.manifest.journalApp.enums.Sentiment;
 import net.manifest.journalApp.model.SentimentData;
 import net.manifest.journalApp.repository.UserRepositoryImpl;
 import net.manifest.journalApp.services.EmailService;
+import net.manifest.journalApp.services.SentimentNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,14 +28,15 @@ import java.util.stream.Collectors;
 public class MyScheduler {
 
      @Autowired
+     private EmailService emailService;
+     @Autowired
      private UserRepositoryImpl userRepositoryImpl;
-
      @Autowired
      private AppCache appCache;
-
      @Autowired
      private KafkaTemplate<String, SentimentData>kafkaTemplate;
-
+     @Autowired
+     private SentimentNotificationService sentimentNotificationService;
 
      //(cron = "SEC MIN HOUR DAYOFTHEMONTH MONTH DAYOFTHEWEEK")
     @Scheduled(cron = "0 0 9 * * SUN")
@@ -74,7 +77,13 @@ public class MyScheduler {
                                  .build();
 
                          log.info("Producing sentiment data for email: {}", sentimentData.getEmail());
-                         kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
+
+                         try{
+                             kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
+                         } catch (KafkaException e) {
+                             log.warn("Kafka producer failed. Falling back to direct email for {}. Reason: {}", sentimentData.getEmail(), e.getMessage());
+                             sentimentNotificationService.sendSentimentReport(sentimentData); // Simplified call
+                         }
 
                      }
                  }

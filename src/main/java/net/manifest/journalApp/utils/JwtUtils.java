@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    @Value("${jwt.secret.key}") // Injects the secret key from application.properties
+    @Value("${jwt.secret.key}") // Injects the secret key from application.yml
     private String SECRET_KEY;
 
     private SecretKey getSigningKey() {
