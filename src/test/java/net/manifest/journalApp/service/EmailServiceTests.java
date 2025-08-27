@@ -22,7 +22,7 @@ public class EmailServiceTests {
 
            //Email with the help of mimeEmail -> Added sender name and email too
             emailService.sendEmail("manishneelambar@gmail.com",
-                    "Testing java mail sender service",
+                    "Testing java mail sender service with Kafka Integration",
                     "How are you my EmailService.",
                     "Journal-App");
        }

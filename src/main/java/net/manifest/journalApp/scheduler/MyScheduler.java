@@ -5,9 +5,11 @@ import net.manifest.journalApp.cache.AppCache;
 import net.manifest.journalApp.entity.JournalEntry;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.enums.Sentiment;
+import net.manifest.journalApp.model.SentimentData;
 import net.manifest.journalApp.repository.UserRepositoryImpl;
 import net.manifest.journalApp.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,17 +26,16 @@ import java.util.stream.Collectors;
 public class MyScheduler {
 
      @Autowired
-     private EmailService emailService;
-
-     @Autowired
      private UserRepositoryImpl userRepositoryImpl;
 
      @Autowired
      private AppCache appCache;
 
+     @Autowired
+     private KafkaTemplate<String, SentimentData>kafkaTemplate;
+
 
      //(cron = "SEC MIN HOUR DAYOFTHEMONTH MONTH DAYOFTHEWEEK")
-
     @Scheduled(cron = "0 0 9 * * SUN")
      public void fetchUsersAndSendSaMail(){ // Sa -> SentimentAnalysis
           log.info("Starting weekly sentiment analysis job.");
@@ -65,16 +66,22 @@ public class MyScheduler {
                      }
 
                      if(mostFrequentSentiment != null) {
-                         log.info("Sending sentiment email to user: {}", user.getUserName());
-                         emailService.sendEmail(user.getEmail(),
-                                 "Your Weekly Sentiment Analysis Report",
-                                 "Hello " + user.getUserName() + ",\n\nYour sentiment for the past week was: " + mostFrequentSentiment.toString() + "\n\nRegards,\nThe Journal App Team",
-                                 "Journal App");
+                         SentimentData sentimentData = SentimentData
+                                 .builder()
+                                 .email(user.getEmail())
+                                 .userName(user.getUserName())
+                                 .sentiment(mostFrequentSentiment.toString())
+                                 .build();
+
+                         log.info("Producing sentiment data for email: {}", sentimentData.getEmail());
+                         kafkaTemplate.send("weekly-sentiments", sentimentData.getEmail(), sentimentData);
+
                      }
                  }
              } catch (Exception e) {
+                 // This catch block now correctly handles errors in fetching/processing user data,
+                 // without interfering with the Kafka logic.
                  log.error("Failed to process sentiment analysis for user {}", user.getUserName(), e);
-                 // The loop will continue to the next user
              }
           }
         log.info("Weekly sentiment analysis job finished.");
