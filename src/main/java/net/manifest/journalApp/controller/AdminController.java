@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.manifest.journalApp.cache.AppCache;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.services.UserService;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@Tag(name="Admin APIs",description = "Get All Users , Admin-SignUp & cleaning app-cache" )
 public class AdminController {
           @Autowired
           private UserService userService;

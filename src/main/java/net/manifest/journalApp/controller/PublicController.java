@@ -1,7 +1,9 @@
 package net.manifest.journalApp.controller;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import net.manifest.journalApp.dto.UserDTO;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.services.UserDetailsServiceImpl;
 import net.manifest.journalApp.services.UserService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/public")
+@Tag(name="Public APIs",description = "User Signup,Login & health-check" )
 public class PublicController {
 
     @Autowired
@@ -29,7 +32,7 @@ public class PublicController {
     private JwtUtils jwtUtils;
 
     @PostMapping("/signup")
-    public ResponseEntity<String>signup(@RequestBody User newUser) {
+    public ResponseEntity<String>signup(@RequestBody UserDTO user) {
 
 //        try{
 //            if(userService.findByUserName(newUser.getUserName()) != null){
@@ -40,6 +43,11 @@ public class PublicController {
 //        }catch (Exception e){
 //             return new ResponseEntity<>("An error occurred during registration.",HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
+        User newUser = new User();
+        newUser.setEmail(user.getEmail());
+        newUser.setUserName(user.getUserName());
+        newUser.setPassword(user.getPassword());
+        newUser.setSentimentAnalysis(user.isSentimentAnalysis());
         userService.saveNewUser(newUser);
         return new ResponseEntity<>("Registration Successful.", HttpStatus.CREATED);
     }

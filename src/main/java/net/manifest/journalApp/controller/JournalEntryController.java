@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.manifest.journalApp.entity.JournalEntry;
 import net.manifest.journalApp.entity.User;
 import net.manifest.journalApp.services.JournalEntryService;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/journal")
+@Tag(name="Journal APIs",description = "Write Journals,Update Journals,Delete Journals of a User" )
 public class JournalEntryController {
 
     @Autowired
