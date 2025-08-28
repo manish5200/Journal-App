@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.manifest.journalApp.api.response.WeatherResponse;
 import net.manifest.journalApp.entity.User;
@@ -27,6 +28,7 @@ public class UserController {
     private WeatherService weatherService;
 
     @PutMapping
+    @Operation(summary = "Updates User")
     public  ResponseEntity<?>updateUser(@RequestBody User user){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String myUserName = authentication.getName();
@@ -38,6 +40,7 @@ public class UserController {
     }
 
     @DeleteMapping
+    @Operation(summary = "Delete User by userName")
     public  ResponseEntity<?>deleteUserByUserName(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String myUserName = authentication.getName();
@@ -47,6 +50,7 @@ public class UserController {
 
 
      @GetMapping("/external-api")
+     @Operation(summary = "External Weather API - To learn how to hit external APIs")
       public ResponseEntity<?>greetings(){
           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
           String  userName = authentication.getName();

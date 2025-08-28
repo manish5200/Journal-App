@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.manifest.journalApp.cache.AppCache;
 import net.manifest.journalApp.entity.User;
@@ -21,6 +22,7 @@ public class AdminController {
           private AppCache appCache;
 
           @GetMapping("/users")
+          @Operation(summary = "Get all Users")
           public ResponseEntity<?>getAllUsers(){
                 List<User> users = userService.getAllUsers();
 
@@ -31,6 +33,7 @@ public class AdminController {
           }
 
           @PostMapping("/admin-signup")
+          @Operation(summary = "Admin Registration/Signup")
           public ResponseEntity<?> registerNewAdmin(@RequestBody User newUser){
                  try{
                      if(userService.findByUserName(newUser.getUserName()) != null){
@@ -47,6 +50,7 @@ public class AdminController {
 
           //Re-Initialising my map
           @GetMapping("/clear-app-cache")
+          @Operation(summary = "Clear App Cache")
           public ResponseEntity<?>clearAppCache(){
                appCache.init();
                return new ResponseEntity<>("App-Cache cleared successfully.",HttpStatus.OK);

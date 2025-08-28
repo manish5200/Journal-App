@@ -1,5 +1,6 @@
 package net.manifest.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.manifest.journalApp.entity.JournalEntry;
 import net.manifest.journalApp.entity.User;
@@ -29,6 +30,7 @@ public class JournalEntryController {
     private UserService userService;
 
     @PostMapping("/user")
+    @Operation(summary = "Add journals for current logged-in user")
     public ResponseEntity<?>createEntry(@RequestBody JournalEntry myEntry) {
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,6 +43,7 @@ public class JournalEntryController {
     }
 
     @GetMapping("/user")
+    @Operation(summary = "Get all journals for current logged-in user")
     public ResponseEntity<?>getAllJournalEntriesOfUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
@@ -54,6 +57,7 @@ public class JournalEntryController {
     }
 
     @GetMapping("Id/{myId}")
+    @Operation(summary = "Get journal for current logged-in user by journal's ObjectId")
     public ResponseEntity<JournalEntry>getJournalById(@PathVariable ObjectId myId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
@@ -70,6 +74,7 @@ public class JournalEntryController {
     }
 
     @DeleteMapping("Id/{myId}")
+    @Operation(summary = "Delete journal for current logged-in user by journal's ObjectId")
     public ResponseEntity<?>deleteEntryById(@PathVariable ObjectId myId) {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          String userName = authentication.getName();
@@ -82,6 +87,7 @@ public class JournalEntryController {
     }
 
     @PutMapping("Id/{myId}")
+    @Operation(summary = "Update journal for current logged-in user by journal's ObjectId")
     public ResponseEntity<?>updateEntryById(@RequestBody JournalEntry newEntry,
                                         @PathVariable ObjectId myId) {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

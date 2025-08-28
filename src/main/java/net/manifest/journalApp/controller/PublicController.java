@@ -1,6 +1,7 @@
 package net.manifest.journalApp.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import net.manifest.journalApp.dto.UserDTO;
@@ -32,6 +33,7 @@ public class PublicController {
     private JwtUtils jwtUtils;
 
     @PostMapping("/signup")
+    @Operation(summary = "User Registration")
     public ResponseEntity<String>signup(@RequestBody UserDTO user) {
 
 //        try{
@@ -53,6 +55,7 @@ public class PublicController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Login - User/Admin")
     public ResponseEntity<String>login(@RequestBody User user) {
          try{
              authenticationManager.authenticate(
@@ -74,6 +77,7 @@ public class PublicController {
     }
 
     @GetMapping("/health-check")
+    @Operation(summary = "Health Check of our apis of the app")
         public ResponseEntity<?> healthCheck(){
         return  new ResponseEntity<>("Hey Manish..., My health is best. Thank you for asking :)",HttpStatus.OK);
     }
