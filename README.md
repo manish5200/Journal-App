@@ -1,6 +1,6 @@
 <!-- Banner -->
 <div align="center">
-  <img src="https://picsum.photos/1200/300" alt="JournalApp API Banner" width="100%"/>
+  <img src="https://picsum.photos/1200/300" alt="Manishfest-Journal API Banner" width="100%"/>
 </div>
 
 
