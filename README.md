@@ -1,114 +1,190 @@
-<!-- A placeholder for a beautiful banner image. You can create one easily on canva.com -->
-
+<!-- Banner -->
 <div align="center">
-<img src="https://www.google.com/search?q=https://placehold.co/1200x300/6366f1/FFFFFF%3Ftext%3DJournalApp%2520API%26font%3Draleway" alt="JournalApp API Banner">
+  <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" alt="JournalApp API Banner" width="100%"/>
 </div>
 
-<h1 align="center">JournalApp API 📝✨</h1>
+<h1 align="center">📓 JournalApp API 📝✨</h1>
+
+<p align="center">
+A powerful and secure backend API for a modern journaling application, built with <strong>Spring Boot</strong>, <strong>MongoDB</strong>, and <strong>Kafka</strong>.
+</p>
+
+---
 
 <div align="center">
-A powerful and secure backend API for a modern journaling application, built with Spring Boot, MongoDB, and Kafka.
+  <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk" alt="Java 17"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=for-the-badge&logo=spring" alt="Spring Boot 3.x"/>
+  <img src="https://img.shields.io/badge/Database-MongoDB-blue?style=for-the-badge&logo=mongodb" alt="MongoDB"/>
+  <img src="https://img.shields.io/badge/Messaging-Kafka-black?style=for-the-badge&logo=apachekafka" alt="Kafka"/>
+  <img src="https://img.shields.io/badge/License-MIT-blueviolet?style=for-the-badge" alt="License MIT"/>
 </div>
 
-<div align="center">
-<!-- Professional Badges -->
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Java-17-orange" alt="Java 17">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Spring%2520Boot-3.x-brightgreen" alt="Spring Boot 3.x">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Database-MongoDB-blue" alt="MongoDB">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Messaging-Kafka-black" alt="Kafka">
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/License-MIT-blueviolet" alt="License MIT">
-</div>
+---
 
-🚀 Overview
-JournalApp API is a complete, production-ready backend designed to power a feature-rich journaling experience. It provides secure user authentication, full CRUD operations for journal entries, a public feed for community interaction, and an intelligent weekly summary system that analyzes user sentiment and mood.
+## 🚀 Overview
 
-The entire system is built on a modern, scalable architecture, featuring a decoupled, asynchronous notification pipeline powered by Apache Kafka.
+JournalApp API is a **production-ready backend** designed to power a rich journaling experience. It provides secure user authentication, full CRUD operations for journal entries, a public community feed, and an automated weekly summary system that analyzes mood and sentiment. An asynchronous pipeline using Apache Kafka is used for notifications and summary processing.
 
-✨ Key Features
-🔐 Secure Authentication: JWT-based authentication and authorization with distinct roles for USER and ADMIN.
+---
 
-✍️ Full Journal Management: Complete GET, POST, PUT, PATCH, and DELETE operations for personal journal entries.
+## ✨ Key Features
 
-🏷️ Powerful Tagging System: Users can add tags to their entries and filter their entire journal history by any tag.
+- **🔐 Secure Authentication** — JWT-based authentication & role-based authorization (`USER`, `ADMIN`).  
+- **✍️ Journal Management** — Create, update, delete, and fetch journal entries (private & public).  
+- **🏷️ Tagging & Search** — Add hashtags, filter/search by tags, date, mood, etc.  
+- **🌐 Public Feed** — Optionally share entries to a public community feed (commenting & rating).  
+- **🧠 Weekly Summaries** — Scheduled job that calculates average mood, dominant mood, average sentiment, and dominant sentiment.  
+- **📨 Kafka Notifications** — Weekly summaries are published/consumed via Kafka and converted into personalized emails.  
+- **👮 Admin Endpoints** — Manage users, moderate content, clean up orphaned data.  
+- **📖 API Docs** — Swagger UI / OpenAPI (SpringDoc) integrated.
 
-🌐 Public Community Feed: Users can choose to make entries public, allowing for community discovery, commenting, and rating.
+---
 
-🧠 Intelligent Weekly Summaries:
+## 🛠️ Tech Stack
 
-An automated background job runs weekly to analyze user activity.
+- **Language:** Java 17  
+- **Framework:** Spring Boot 3  
+- **Database:** MongoDB  
+- **Messaging:** Apache Kafka  
+- **Security:** Spring Security, JWT  
+- **Build:** Maven  
+- **API Docs:** SpringDoc OpenAPI / Swagger UI
 
-It calculates the user's average mood and dominant mood.
+---
 
-It performs rule-based Sentiment Analysis on the journal text to determine the emotional tone.
+## 🏁 Getting Started
 
-📨 Asynchronous Notifications: A decoupled system using Kafka to produce and consume weekly summary reports, which are then formatted into personalized, empathetic emails.
+### Prerequisites
 
-👮‍♂️ Admin Panel: Secure endpoints for administrators to manage users (delete, ban, promote) and moderate content.
+Make sure you have installed:
 
-📖 Interactive API Documentation: Full API documentation powered by Swagger UI.
+- Java 17 or later  
+- Apache Maven  
+- MongoDB (local or Atlas)  
+- Kafka (local or Confluent Cloud)  
+- An SMTP service (SendGrid, Gmail SMTP, etc.) for email delivery
 
-🛠️ Tech Stack
-Backend: Java 17, Spring Boot 3
+---
 
-Database: MongoDB
+### 1. Clone the repository
 
-Security: Spring Security, JSON Web Tokens (JWT)
-
-Messaging: Apache Kafka
-
-Build Tool: Maven
-
-API Docs: SpringDoc (OpenAPI 3 / Swagger UI)
-
-🏁 Getting Started
-Follow these instructions to get the project up and running on your local machine.
-
-Prerequisites
-Java JDK 17 or later
-
-Apache Maven
-
-MongoDB (running locally or a cloud instance like MongoDB Atlas)
-
-An active Kafka instance (e.g., from Confluent Cloud or a local setup)
-
-An SMTP server or service (like SendGrid) for sending emails.
-
-1. Clone the Repository
-git clone [https://github.com/your-username/journal-app-api.git](https://github.com/your-username/journal-app-api.git)
+```bash
+git clone https://github.com/your-username/journal-app-api.git
 cd journal-app-api
+```
 
-2. Configure the Application
-The heart of the application's configuration is in src/main/resources/application.properties.
+---
 
-Create the file: If it doesn't exist, create it.
+### 2. Configuration
 
-Add your secrets: Copy the contents of application.properties.example (if you have one) or use the template below and fill in your own credentials for MongoDB, Kafka, JWT, and your email service.
+Create `src/main/resources/application.properties` (or `application.yml`) and add your secrets/configs. Example `application.properties`:
 
-# src/main/resources/application.properties
+```properties
+# MongoDB
+spring.data.mongodb.uri=mongodb+srv://<user>:<pass>@cluster0.mongodb.net/journalapp?retryWrites=true&w=majority
 
-# MongoDB Configuration
-spring.data.mongodb.uri=<YOUR_MONGODB_CONNECTION_STRING>
-
-# JWT Secret (use a long, random string)
-jwt.secret=<YOUR_SUPER_SECRET_JWT_KEY>
+# JWT
+jwt.secret=replace_with_a_very_long_random_string
 jwt.expiration.ms=86400000
 
-# Kafka Configuration
-spring.kafka.bootstrap-servers=<YOUR_KAFKA_BOOTSTRAP_SERVER>
-# ... other Kafka properties (SASL, etc.)
+# Kafka
+spring.kafka.bootstrap-servers=localhost:9092
+# Additional kafka properties (SASL etc.) as needed
 
-# Email (SMTP) Configuration
-spring.mail.host=<YOUR_SMTP_HOST>
-spring.mail.port=<YOUR_SMTP_PORT>
-spring.mail.username=<YOUR_SMTP_USERNAME>
-spring.mail.password=<YOUR_SMTP_PASSWORD>
+# SMTP (Email)
+spring.mail.host=smtp.example.com
+spring.mail.port=587
+spring.mail.username=your-smtp-user
+spring.mail.password=your-smtp-pass
 
-3. Build and Run
-Use Maven to build and run the application.
+# SpringDoc / Swagger (optional)
+springdoc.api-docs.path=/v3/api-docs
+```
 
-# Build the project
+> Tip: For production, store secrets in environment variables or a secrets manager. Do **not** commit credentials.
+
+---
+
+### 3. Build & Run
+
+```bash
+# Build
 mvn clean install
 
-# Run the application
+# Run
 mvn spring-boot:run
+```
+
+The application starts on `http://localhost:8080` by default (unless overridden).
+
+---
+
+## 📖 API Documentation
+
+Once the app is running, open the interactive docs:
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html` or `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+---
+
+## 🧭 Project Structure (high level)
+
+```
+src/main/java
+ └── net.manifest.journalapp
+     ├── config        # Kafka, security, app configs
+     ├── controller    # REST controllers (Auth, Journal, Admin)
+     ├── dto           # Request/response DTOs
+     ├── entity        # MongoDB entities (JournalEntry, User, WeeklySummary)
+     ├── enums         # Mood, Sentiment, Roles
+     ├── repository    # Spring Data MongoDB repositories
+     ├── scheduler     # WeeklySummaryScheduler
+     └── services      # Business logic & integrations
+```
+
+---
+
+## ✅ Common Operational Notes
+
+- **Weekly summary job** — runs as a scheduled task using Spring `@Scheduled` (e.g., every Sunday) and aggregates mood/sentiment per user.
+- **Kafka** — used for decoupled processing (produce weekly summary events, consume to format/send emails).
+- **Mongo indexes** — ensure `userId` and frequently queried fields are indexed for performance.
+- **Enum storage** — enums are stored as strings for readability and backward compatibility.
+
+---
+
+## 🧪 Testing
+
+- Unit tests: `mvn test`  
+- For integration tests, use embedded MongoDB (Flapdoodle) or a test container, and a Kafka test container.
+
+---
+
+## 📬 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repo  
+2. Create a feature branch (`git checkout -b feat/your-feature`)  
+3. Commit your changes (`git commit -m "feat: ..."` )  
+4. Push (`git push origin feat/your-feature`)  
+5. Open a Pull Request and describe the change
+
+Please open an issue before working on large features so we can coordinate.
+
+---
+
+## 📝 License
+
+This project is licensed under the **MIT License** — see the `LICENSE` file for details.
+
+---
+
+## 🙋 Support / Contact
+
+If you need help, open an issue, or contact the maintainer at `your-email@example.com`.
+
+---
+
+Thank you for using **JournalApp API** — build something beautiful. ✨
