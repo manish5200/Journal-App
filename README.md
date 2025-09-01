@@ -1,7 +1,8 @@
 <!-- Banner -->
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726a?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" alt="JournalApp API Banner" width="100%"/>
+  <img src="https://picsum.photos/1200/300" alt="JournalApp API Banner" width="100%"/>
 </div>
+
 
 <h1 align="center">📓 JournalApp API 📝✨</h1>
 
