@@ -4,7 +4,7 @@
 </div>
 
 
-<h1 align="center">📓 JournalApp API 📝✨</h1>
+<h1 align="center">📓 Manishfest-Journal API 📝✨</h1>
 
 <p align="center">
 A powerful and secure backend API for a modern journaling application, built with <strong>Spring Boot</strong>, <strong>MongoDB</strong>, and <strong>Kafka</strong>.
