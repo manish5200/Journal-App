@@ -16,6 +16,8 @@ public class JwtUtils {
 
     @Value("${jwt.secret.key}") // Injects the secret key from application.yml
     private String SECRET_KEY;
+    @Value("${jwt.expiration.ms}")
+    private long jwtExpirationMs;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -55,7 +57,7 @@ public class JwtUtils {
                 .header().empty().add("typ", "JWT")
                 .and()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) //5 minutes expiration
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) //5 minutes expiration
                 .signWith(getSigningKey())
                 .compact();
     }

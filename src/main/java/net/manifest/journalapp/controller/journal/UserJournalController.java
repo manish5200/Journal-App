@@ -3,6 +3,7 @@ package net.manifest.journalapp.controller.journal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import net.manifest.journalapp.dto.journal.JournalEntryDTO;
 import net.manifest.journalapp.dto.journal.JournalEntryPatchDTO;
 import net.manifest.journalapp.dto.journal.JournalResponseDTO;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/me/journals")
 @Tag(name = "My Journal APIs", description = "Endpoints for managing the authenticated user's own journal entries")
@@ -65,6 +67,29 @@ public class UserJournalController {
         User loggedInUser = getCurrentUserFromDatabase();
         Page<JournalResponseDTO> entriesForUser = journalEntryService.getEntriesForUser(loggedInUser, pageable);
         return  ResponseEntity.ok(entriesForUser);
+    }
+
+
+    //FILTERING USING TAGS
+    /**
+     * Retrieves a paginated list of the user's journal entries that contain a specific tag.
+     *
+     * @param tag      The tag to filter by, passed as a query parameter (e.g., ?tag=work).
+     * @param pageable Standard pagination parameters.
+     * @return A ResponseEntity containing a Page of matching journal entry DTOs.
+     */
+    @Operation(summary = "Get my journal entries filtered by a specific tag")
+    @GetMapping("/by-tag")
+    public ResponseEntity<?> getMyJournalEntriesUsingTag(@RequestParam String tag ,
+                                                                                @PageableDefault(sort="createdAt",direction = Sort.Direction.DESC) Pageable pageable){
+        User user = getCurrentUserFromDatabase();
+        try{
+            Page<JournalResponseDTO> entries = journalEntryService.getEntriesForUserByTag(user, tag, pageable);
+            return ResponseEntity.ok(entries);
+        }catch(Exception e){
+             log.error("Error in filtering the entries using tags for user having user ID: {} and username: {}",user.getId(),user.getUsername());
+             return ResponseEntity.badRequest().body("Error in filtering the entries using tags.");
+        }
     }
 
     //CREATION - CONTROLLER

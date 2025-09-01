@@ -2,6 +2,8 @@ package net.manifest.journalapp.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.manifest.journalapp.enums.Mood;
+import net.manifest.journalapp.enums.Sentiment;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -10,8 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 /**
- * Stores the aggregated results of a user's weekly journaling activity.
- * This data is calculated by a scheduled job and used to send personalized summary emails.
+ * Stores the aggregated and pre-calculated results of a user's weekly journaling activity.
+ * This collection is populated by a scheduled background job (WeeklySummaryScheduler)
+ * and serves as a fast data source for features like personalized summary emails.
  */
 @Document(collection = "weekly_summaries")
 @Data
@@ -24,24 +27,24 @@ public class WeeklySummary {
     @Indexed
     private ObjectId userId;
 
-
-     //The average mood score, calculated from the user's self-reported moods (e.g., 1-5).
-
+    // --- Mood-Based Metrics ---
     private double averageMoodScore;
 
+    /**
+     * The most frequently reported mood for the week. Storing the enum type ensures data integrity.
+     */
+    private Mood dominantMood;
 
-     //The most frequently reported mood for the week (e.g., "GOOD", "MEH").
+    // --- Sentiment-Based Metrics ---
+    private double averageSentimentScore;
 
-    private String dominantMood;
+    /**
+     * The most frequently analyzed sentiment for the week. Storing the enum type ensures data integrity.
+     */
+    private Sentiment dominantSentiment;
 
-
-     //The total number of journal entries the user created during the week.
+    // --- General Metrics ---
     private int entryCount;
-
-
-     // The date and time this summary was last calculated.
-
     private LocalDateTime lastCalculated;
-
 }
 

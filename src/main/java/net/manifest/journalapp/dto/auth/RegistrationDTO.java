@@ -15,5 +15,5 @@ public class RegistrationDTO{
     private String name;
     @NonNull
     private String email;
-    private boolean sentimentAnalysis=true;
+    private boolean sentimentAnalysisEnabled = true;
 }

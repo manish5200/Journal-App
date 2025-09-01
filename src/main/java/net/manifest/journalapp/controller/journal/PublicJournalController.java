@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/journals/")
+@RequestMapping("/api/journals/public")
 @Tag(name = "Public Journal APIs", description = "Endpoints for discovering and interacting with public entries")
 public class PublicJournalController {
 
@@ -54,6 +54,19 @@ public class PublicJournalController {
         return ResponseEntity.ok(publicEntries);
     }
 
+    /**
+     * Retrieves a paginated list of public journal entries that contain a specific tag.
+     * @param tag The tag to filter by, passed as a query parameter (e.g., ?tag=philosophy).
+     * @param pageable Standard pagination parameters.
+     * @return A ResponseEntity containing a Page of matching public journal entry DTOs.
+     */
+    @Operation(summary = "Get public journal entries filtered by a specific tag")
+    @GetMapping("/by-tag")
+    public ResponseEntity<Page<JournalResponseDTO>> getPublicJournalEntriesByTag(@RequestParam String tag,
+            @PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable){
+        Page<JournalResponseDTO> publicEntries = journalEntryService.getPublicEntriesByTag(tag,pageable);
+        return ResponseEntity.ok(publicEntries);
+    }
 
 
     /**

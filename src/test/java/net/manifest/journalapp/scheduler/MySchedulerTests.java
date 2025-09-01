@@ -9,10 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class MySchedulerTests {
 
        @Autowired
-      private  MyScheduler myScheduler;
-
+       private  MyScheduler myScheduler;
        @Test
        public  void testMyScheduler(){
-             myScheduler.fetchUsersAndSendSaMail();
+           myScheduler.fetchUsersAndSendSaMail();
        }
 }

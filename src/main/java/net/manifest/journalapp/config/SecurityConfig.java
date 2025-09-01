@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/me/journals/**",
                                 "/api/me/**",
-                                "/api/journals/**"
+                                "/api/journals/public/**"
                         ).authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())  // all except journal requests does not need authentication

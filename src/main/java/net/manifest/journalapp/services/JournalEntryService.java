@@ -5,6 +5,7 @@ import net.manifest.journalapp.dto.journal.JournalEntryDTO;
 import net.manifest.journalapp.dto.journal.JournalEntryPatchDTO;
 import net.manifest.journalapp.dto.journal.JournalResponseDTO;
 import net.manifest.journalapp.entity.User;
+import net.manifest.journalapp.enums.Sentiment;
 import net.manifest.journalapp.mapper.JournalMapper;
 import net.manifest.journalapp.repository.*;
 import net.manifest.journalapp.entity.JournalEntry;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,6 +32,8 @@ public class JournalEntryService {
     private JournalEntryRepository journalEntryRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SentimentAnalysisService sentimentAnalysisService;
 
 
     //GET ALL ENTRIES FOR A USER
@@ -55,16 +57,19 @@ public class JournalEntryService {
             // 2. Set fields that are not in the DTO (ownership, timestamps)
               newEntry.setUserId(user.getId());
               newEntry.setCreatedAt(LocalDateTime.now());
-            // 3. Save the entity to the database
+            //3. Analyze sentiment and set to entry
+            Sentiment analyzedSentiment = sentimentAnalysisService.analyze(newEntry);
+            newEntry.setSentiment(analyzedSentiment);
+            // 4. Save the entity to the database
             JournalEntry savedEntry = journalEntryRepository.save(newEntry);
             log.info("New journal entry saved with ID: {} for user: {}", savedEntry.getId(), user.getUsername());
-
             return JournalMapper.toResponseDTO(savedEntry,user.getUsername());
         }catch(Exception e){
             log.error("Error saving new journal entry for user: {}", user.getUsername(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create journal");
         }
     }
+
 
     //READ ONE JOURNAL FOR A USER
     @Transactional
@@ -97,7 +102,11 @@ public class JournalEntryService {
             entryToUpdate.setLocation(journalDTO.getLocation());
             entryToUpdate.setWeather(journalDTO.getWeather());
             entryToUpdate.setPublic(journalDTO.getIsPublic());
+            entryToUpdate.setTags(journalDTO.getTags());
             entryToUpdate.setUpdatedAt(LocalDateTime.now());
+            //Analyze sentiment and set to entry
+            Sentiment analyzedSentiment = sentimentAnalysisService.analyze(entryToUpdate);
+            entryToUpdate.setSentiment(analyzedSentiment);
             JournalEntry savedEntry = journalEntryRepository.save(entryToUpdate);
             log.info("Replaced (PUT) journal entry with ID: {}", savedEntry.getId());
             return Optional.of(JournalMapper.toResponseDTO(savedEntry, user.getUsername()));
@@ -107,7 +116,7 @@ public class JournalEntryService {
         }
     }
 
-    //PATH THE JOURNAL ENTRY
+    //PATCH THE JOURNAL ENTRY
     @Transactional
     public Optional<JournalResponseDTO>patchEntry(ObjectId journalId, JournalEntryPatchDTO patchDto, User user){
         try{
@@ -122,8 +131,11 @@ public class JournalEntryService {
             if (patchDto.getLocation() != null) entryToUpdate.setLocation(patchDto.getLocation());
             if (patchDto.getWeather() != null) entryToUpdate.setWeather(patchDto.getWeather());
             if (patchDto.getIsPublic() != null) entryToUpdate.setPublic(patchDto.getIsPublic());
+            if (patchDto.getTags() != null) entryToUpdate.setTags(patchDto.getTags());
             entryToUpdate.setUpdatedAt(LocalDateTime.now());
-
+            //Analyze sentiment and set to entry
+            Sentiment analyzedSentiment = sentimentAnalysisService.analyze(entryToUpdate);
+            entryToUpdate.setSentiment(analyzedSentiment);
             JournalEntry savedEntry = journalEntryRepository.save(entryToUpdate);
             log.info("Patched journal entry with ID: {}", savedEntry.getId());
             return Optional.of(JournalMapper.toResponseDTO(savedEntry, user.getUsername()));
@@ -170,6 +182,20 @@ public class JournalEntryService {
          }
     }
 
+    //FILTERING BY TAGs
+    public Page<JournalResponseDTO>getEntriesForUserByTag(User user ,String tag , Pageable pageable){
+
+        try{
+            Page<JournalEntry>entriesPage = journalEntryRepository.findByUserIdAndTagsContains(user.getId(),tag,pageable);
+            return entriesPage.map(entry ->
+                    JournalMapper.toResponseDTO(entry,user.getUsername()));
+        }catch (Exception e){
+            log.error("Error in filtering the entries using tag");
+            throw new RuntimeException("Error in filtering the entries by tag.",e);
+        }
+    }
+
+
     // --------------------------------------------------------------------
     // --- NEW METHODS FOR PUBLICJOURNALCONTROLLER ---
     // --------------------------------------------------------------------
@@ -194,6 +220,30 @@ public class JournalEntryService {
                throw new RuntimeException("Could not fetch public journal entries.", e);
            }
     }
+
+    /**
+     * Retrieves a paginated list of public journal entries that are tagged with a specific tag.
+     * @param tag The tag to filter by.
+     * @param pageable The pagination information.
+     * @return A Page of matching public JournalResponseDTO objects.
+     */
+
+    public Page<JournalResponseDTO> getPublicEntriesByTag(String tag,Pageable pageable) {
+        try{
+            // 1. Fetch the page of public entities from the repository.
+            Page<JournalEntry> publicJournalEntry = journalEntryRepository.findByIsPublicAndTagsContains(true,tag,pageable);
+            // 2. Map the entities to response DTOs.
+            log.info("Public journal entries fetched successfully using tag.");
+            return publicJournalEntry.map(
+                    entry -> JournalMapper
+                            .toResponseDTO(entry,"A User"));
+        }catch (Exception e){
+            log.error("Error fetching public journal entries with tag '{}'", tag, e);
+            throw new RuntimeException("Could not fetch public journal entries by tag.", e);
+        }
+    }
+
+
 
     /**
      * Finds a single public journal entry by its ID.
@@ -280,7 +330,5 @@ public class JournalEntryService {
             log.error("Error adding rating to journal entry {}:", journalId, e);
             throw e; // Re-throw the exception for the controller to handle
         }
-
-
     }
 }

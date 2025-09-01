@@ -10,6 +10,7 @@ import net.manifest.journalapp.enums.AccountStatus;
 import net.manifest.journalapp.enums.Role;
 import net.manifest.journalapp.repository.JournalEntryRepository;
 import net.manifest.journalapp.repository.UserRepository;
+import net.manifest.journalapp.repository.WeeklySummaryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,6 +32,9 @@ public class UserService {
         private UserRepository userRepository;
         @Autowired
         private JournalEntryRepository journalEntryRepository;
+        @Autowired
+        private WeeklySummaryRepository weeklySummaryRepository;
+
 
         private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -49,9 +53,9 @@ public class UserService {
                 newUser.setPassword(hashedPassword);
                 newUser.setName(registrationDTO.getName());
                 newUser.setEmail(registrationDTO.getEmail());
-                newUser.setSentimentAnalysis(registrationDTO.isSentimentAnalysis());
                 newUser.setRoles(Collections.singleton(Role.ROLE_USER));
                 newUser.setAccountStatus(AccountStatus.ACTIVE);
+                newUser.setSentimentAnalysisEnabled(registrationDTO.isSentimentAnalysisEnabled());
                 newUser.setCreatedAt(LocalDateTime.now());
                 userRepository.save(newUser);
                 log.info("New user registered successfully.");
@@ -72,7 +76,7 @@ public class UserService {
             if(userUpdateDTO.getEmail() != null){
                 user.setEmail(userUpdateDTO.getEmail());
             }
-            user.setSentimentAnalysis(userUpdateDTO.isSentimentAnalysis());
+            user.setSentimentAnalysisEnabled(userUpdateDTO.isSentimentAnalysisEnabled());
             user.setUpdatedAt(LocalDateTime.now());
             return userRepository.save(user);
         }
@@ -149,9 +153,11 @@ public class UserService {
 
          //1. Delete the associated data
         journalEntryRepository.deleteAllByUserId(userId);
-        //weeklySummaryRepository.deleteAllByUserId(userId);  // will implement in future
-         //2. Delete the user
+         //2. Delete the associated weekly summary
+        weeklySummaryRepository.deleteByUserId(userId);  // will implement in future
+         //3. Delete the user
         userRepository.deleteById(userId);
+
     }
 
 }

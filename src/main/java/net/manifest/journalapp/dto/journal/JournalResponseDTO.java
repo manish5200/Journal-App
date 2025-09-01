@@ -9,6 +9,7 @@ import net.manifest.journalapp.enums.Sentiment;
 import net.manifest.journalapp.utils.journalutils.Location;
 import net.manifest.journalapp.utils.journalutils.RatingStats;
 import net.manifest.journalapp.utils.journalutils.Weather;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +23,7 @@ public class JournalResponseDTO {
     private String createdBy;
     private Sentiment sentiment;
     private Mood mood;
+    private List<String> tags;
     private RatingStats ratingStats;
     private Location location;
     private Weather weather;

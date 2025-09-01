@@ -74,9 +74,9 @@ public class UserProfileController {
     //ExternalAPI
     @GetMapping("/external-api")
      @Operation(summary = "External Weather API - To learn how to hit external APIs")
-      public ResponseEntity<String>greetings(){
+      public ResponseEntity<String>greetings(@RequestParam String city){
           String  userName = getCurrentUserFromDatabase().getUsername();
-         WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
+         WeatherResponse weatherResponse = weatherService.getWeather(city);
          String response ="";
          if(weatherResponse != null){
              response = ", Weather feels like "+weatherResponse.getCurrent().getFeelslike();

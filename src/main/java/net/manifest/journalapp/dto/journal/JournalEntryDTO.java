@@ -10,6 +10,8 @@ import net.manifest.journalapp.enums.Mood;
 import net.manifest.journalapp.utils.journalutils.Location;
 import net.manifest.journalapp.utils.journalutils.Weather;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -23,6 +25,11 @@ public class JournalEntryDTO {
     @Size(max = 50000, message = "Content must not exceed 50000 characters")
     private String content; // Content is optional
 
+    /**
+     * A list of user-defined tags for categorizing the entry.
+     * Examples: ["work", "gratitude", "travel", "project-alpha", "family-event"]
+     */
+    private List<String> tags;
     /**
      * Controls the visibility of the entry.
      * Defaults to 'false' (private) to ensure user privacy by default.

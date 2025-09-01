@@ -28,16 +28,25 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
 
+        // 1. Check if the Authorization header is present and correctly formatted.
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtUtils.extractUsername(token);
+            try{
+                username = jwtUtils.extractUsername(token);
+            } catch (Exception e) {
+                // Handle exceptions for expired or invalid tokens
+                logger.warn("JWT token processing error: " + e.getMessage());
+            }
         }
 
+        // 2. If we have a username and there's no existing authentication in the context...
         if(username != null  && SecurityContextHolder.getContext().getAuthentication() == null){
+            // ...load the user's details from the database.
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             Boolean isValidToken = jwtUtils.validateToken(token);
             if(Boolean.TRUE.equals(isValidToken)){
@@ -50,6 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
        // response.addHeader("admin","Manish");
+        // 4. Continue the filter chain for the next filter to process.
         filterChain.doFilter(request,response);
     }
 }

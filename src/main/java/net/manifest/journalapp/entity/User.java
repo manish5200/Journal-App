@@ -55,10 +55,6 @@ public class User {
     @NotBlank(message = "Password is required.")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
-    private boolean sentimentAnalysis;
-
-
     // --- Security & Authorization ---
     /**
      * A set of roles assigned to the user (e.g., ROLE_USER, ROLE_ADMIN) because set prevents duplicate roles.
@@ -75,7 +71,6 @@ public class User {
      * This is a user-controlled setting.
      */
     private boolean sentimentAnalysisEnabled = true;
-
 
     // --- Timestamps & Auditing ---
     private LocalDateTime createdAt;
