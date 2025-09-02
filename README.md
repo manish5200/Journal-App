@@ -70,8 +70,8 @@ Make sure you have installed:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/journal-app-api.git
-cd journal-app-api
+git clone https://github.com/your-username/manishfest-journals.git
+cd manishfest-journals
 ```
 
 ---
@@ -184,7 +184,7 @@ This project is licensed under the **MIT License** — see the `LICENSE` file fo
 
 ## 🙋 Support / Contact
 
-If you need help, open an issue, or contact the maintainer at `your-email@example.com`.
+If you need help, open an issue, or contact the maintainer at `manishksingh.mnnit@gmail.com`.
 
 ---
 
