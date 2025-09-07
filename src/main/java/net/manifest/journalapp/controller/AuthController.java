@@ -72,25 +72,35 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Login - User/Admin")
     public ResponseEntity<?>login(@RequestBody LoginDTO loginDTO) {
+
         try{
-            User user = new User();
-            user.setUsername(loginDTO.getUserName());
-            user.setPassword(loginDTO.getPassword());
-            user.setLastLoginAt(LocalDateTime.now());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            user.getUsername(),
-                            user.getPassword())
+                            loginDTO.getUsername(),
+                            loginDTO.getPassword())
             );
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-            String token = jwtUtils.generateToken(userDetails.getUsername());
-            return ResponseEntity.ok(new JwtResponseDTO(token,
-                    userDetails.getUsername()
-                    , roles));
+            // If authentication is successful, the code proceeds. If not, an exception is thrown.
+            log.info("User '{}' authenticated successfully.", loginDTO.getUsername());
+            // 2. Fetch the full user details from the database
+            User user = userService.findByUsername(loginDTO.getUsername())
+                    .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
 
+            // 3. Update the last login timestamp
+            user.setLastLoginAt(LocalDateTime.now());
+            userService.save(user); // Save the updated user object
+            log.info("Updated lastLoginAt timestamp for user '{}'.", user.getUsername());
+
+            // 4. Generate the JWT
+            String token = jwtUtils.generateToken(user.getUsername());
+            List<String> roles = user.getRoles().stream()
+                    .map(role -> role.name())
+                    .collect(Collectors.toList());
+
+            log.info("Successfully logged in and JWT generated for authentication purpose");
+
+            return ResponseEntity.ok(new JwtResponseDTO(token,
+                    user.getUsername()
+                    , roles));
         }catch (BadCredentialsException ex){
             log.error("Incorrect username or password. ",ex);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password");
@@ -98,7 +108,5 @@ public class AuthController {
             log.error("Exception occurred while creating AuthenticationToken: "+"Login Method",e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication error");
         }
-
     }
-
 }

@@ -15,14 +15,12 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -34,14 +32,24 @@ public class UserService {
         private JournalEntryRepository journalEntryRepository;
         @Autowired
         private WeeklySummaryRepository weeklySummaryRepository;
-
-
-        private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
         //Extract username
         public String authenticatedUsername(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
+       }
+
+     /**
+      * Saves a user entity to the database. This can be used for both
+      * creating a new user and updating an existing one.
+      * @param user The User entity to save.
+      * @return The saved User entity.
+      */
+       public User save(User user) {
+        log.debug("Saving user with username: {}", user.getUsername());
+        return userRepository.save(user);
        }
 
         //Registration
@@ -110,7 +118,7 @@ public class UserService {
            return userRepository.findByUsername(username);
     }
 
-    public Optional<Object> findByEmail(@NonNull String email) {
+    public Optional<User> findByEmail(@NonNull String email) {
             return userRepository.findByEmail(email);
     }
 
@@ -157,7 +165,45 @@ public class UserService {
         weeklySummaryRepository.deleteByUserId(userId);  // will implement in future
          //3. Delete the user
         userRepository.deleteById(userId);
+    }
 
+
+    // GOOGLE OAUTH2
+
+    /**
+     * Finds an existing user by their email or creates a new one if they don't exist.
+     * This is the dedicated method for handling users logging in via the manual GoogleAuthController.
+     *
+     * @param userInfo The map of user attributes received from the Google token info endpoint.
+     * @return The found or newly created User entity.
+     */
+
+    public User findOrCreateOauthUser(Map<String,Object> userInfo){
+
+        String email = (String) userInfo.get("email");
+        String name = (String) userInfo.get("name");
+        // The correct way to "find or create" is to check for the user by their unique email.
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent()){
+            // If the user already exists, we simply update their last login time and return them.
+            User existingUser = userOptional.get();
+            existingUser.setLastLoginAt(LocalDateTime.now());
+            return userRepository.save(existingUser);
+        }else{
+            // If the user is new, we create a new account for them.
+            User newUser = new User();
+            // Use the email as the username to guarantee uniqueness. This is a common pattern.
+            newUser.setUsername(email);
+            newUser.setEmail(email);
+            newUser.setName(name);
+            // Set the random password as per your requirement, using the OFFICIAL encoder.
+            newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            newUser.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_USER)));
+            newUser.setAccountStatus(AccountStatus.ACTIVE);
+            newUser.setCreatedAt(LocalDateTime.now());
+            newUser.setLastLoginAt(LocalDateTime.now());
+            return userRepository.save(newUser);
+        }
     }
 
 }
