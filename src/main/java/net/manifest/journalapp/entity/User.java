@@ -3,78 +3,96 @@ package net.manifest.journalapp.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.manifest.journalapp.enums.AccountStatus;
 import net.manifest.journalapp.enums.Role;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Document(collection = "users")
 @Data
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails{
 
-    // --- Primary Identifier ---
     @Id
     private ObjectId id;
 
-
-    // --- Core Identity & Credentials ---
-    /**
-     * The unique, public-facing username for the user. Used for login.
-     */
     @Indexed(unique = true)
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters.")
-    private  String username;
+    @NotBlank
+ //   @Size(min = 3, max =50)
+    private String username;
 
-    /**
-     * The user's full name for personalization.
-     */
-    @NotBlank(message = "Name is required.")
+    @NotBlank
     private String name;
 
-    /**
-     * The unique email address for the user. Used for login and communication.
-     */
     @Indexed(unique = true)
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Please provide a valid email address.")
+    @NotBlank
+    @Email
     private String email;
 
-    /**
-     * The user's hashed password. Marked as WRITE_ONLY to prevent serialization in API responses.
-     */
-    @NotBlank(message = "Password is required.")
+    @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    // --- Security & Authorization ---
-    /**
-     * A set of roles assigned to the user (e.g., ROLE_USER, ROLE_ADMIN) because set prevents duplicate roles.
-     */
-    private Set<Role> roles = new HashSet<>();
-    /**
-     * The current status of the user's account.
-     */
-    private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
-    // --- Application-Specific Fields ---
-    /**
-     * If true, the app will automatically analyze and save sentiment for new entries.
-     * This is a user-controlled setting.
-     */
+    private Set<Role> roles = new HashSet<>();
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
     private boolean sentimentAnalysisEnabled = true;
 
-    // --- Timestamps & Auditing ---
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;
 
+
+    //USER DETAILS IMPL
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return password; // Return the password field
+    }
+
+    @Override
+    public String getUsername() {
+        return username; // Return the username field
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Or logic based on your requirements
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        // You could use your AccountStatus enum here
+        return accountStatus != AccountStatus.LOCKED;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Or logic based on your requirements
+    }
+
+    @Override
+    public boolean isEnabled() {
+        // You could use your AccountStatus enum here
+        return accountStatus == AccountStatus.ACTIVE;
+    }
 }
+

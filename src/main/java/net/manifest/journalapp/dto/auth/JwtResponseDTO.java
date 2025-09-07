@@ -1,6 +1,7 @@
 package net.manifest.journalapp.dto.auth;
 
 import lombok.*;
+import net.manifest.journalapp.enums.Role;
 
 import java.util.List;
 
@@ -11,5 +12,4 @@ public class JwtResponseDTO {
     private String token;
     private String username;
     private List<String> roles;
-
 }

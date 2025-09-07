@@ -1,75 +1,74 @@
 package net.manifest.journalapp.config;
 
+import net.manifest.journalapp.config.security.ApiOAuth2AuthenticationSuccessHandler;
 import net.manifest.journalapp.filter.JwtFilter;
-import net.manifest.journalapp.services.UserDetailsServiceImpl;
+import net.manifest.journalapp.services.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@Profile("dev")
+@Profile("dev") // This configuration is only active when the "dev" profile is used.
+@EnableMethodSecurity // This is needed for @PreAuthorize to work
 public class SecurityConfig {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+
     @Autowired
     private JwtFilter jwtFilter;
-
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired
+    private ApiOAuth2AuthenticationSuccessHandler apiOAuth2AuthenticationSuccessHandler;
 
     @Bean
-    public SecurityFilterChain  securityFilterChain(HttpSecurity http) throws Exception {
-       return http.authorizeHttpRequests(request -> request
-                       .requestMatchers(
-                               "/api/public/**",
-                               "/api/auth/**",
-                               "/swagger-ui/**",
-                               "/v3/api-docs/**"
-                         ).permitAll()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // We build a single, continuous chain of configuration on the 'http' object.
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request -> request
+                        // 1. Define all public URLs first.
                         .requestMatchers(
-                                "/api/me/journals/**",
-                                "/api/me/**",
-                                "/api/journals/public/**"
-                        ).authenticated()
+                                "/api/auth/**",
+                                "/oauth2/**",
+                                "/auth/google/**",
+                                "/login/oauth2/code/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**"
+                        ).permitAll()
+                        // 2. Define rules for specific roles.
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())  // all except journal requests does not need authentication
+                        // 3. Define a general rule for all other authenticated requests.
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(apiOAuth2AuthenticationSuccessHandler)
+                )
+                // 4. Add our custom JWT filter to the chain.
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-               .csrf(AbstractHttpConfigurer::disable)
-               .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-               .build();
-    }
-
-    /*
-    This configureGlobal method is part of the old,
-     deprecated way of configuring Spring Security.
-     It creates the exact circular dependency we
-     discussed because it tries to manually wire up the
-     UserDetailsService and PasswordEncoder while the
-     security configuration itself is still being built.
-     */
-
-//    @Bean
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
-//          auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-//    }
-// This bean is the modern replacement for the old 'configureGlobal' method
-
-    @Bean
-    public  PasswordEncoder passwordEncoder(){
-          return  new BCryptPasswordEncoder();
+        // 5. Finally, afterAA all configuration is added, call .build() and return the result.
+        // This creates the SecurityFilterChain that the method requires.
+        return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration auth) throws Exception {
-        return auth.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
+
 }
+
